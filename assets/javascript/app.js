@@ -77,6 +77,30 @@ $(document).ready(function() {
 	gameData.on("value", function (snapshot) {
 		numPlayers = snapshot.val().numPlayers;
 	});
+	gameData.child("one").child("name").on("value", onNameOne)
+	function onNameOne(snapshot)
+	{	
+		if(playerNum == 2)
+		{
+			console.log("Player 1 entered!");
+			var nameTwo = $('<p>');
+			nameTwo.attr('id', 'opponentName');
+			nameTwo.append(snapshot.val());
+			$("#playerTwo").append(nameTwo);
+		}
+	}
+	gameData.child("two").child("name").on("value", onNameTwo)
+	function onNameTwo(snapshot)
+	{
+		if(playerNum == 1)
+		{
+			console.log("Player 2 entered!");
+			var nameTwo = $('<p>');
+			nameTwo.attr('id', 'opponentName');
+			nameTwo.append(snapshot.val());
+			$("#playerTwo").append(nameTwo);
+		}
+	}
 	gameData.child("one").child("choice").on("value", onChangeOne);
 	function onChangeOne(snapshot) {
 		if(snapshot.val() == "rock" || snapshot.val() == "paper" || snapshot.val() == "scissors")
