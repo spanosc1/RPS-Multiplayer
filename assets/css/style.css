@@ -42,7 +42,7 @@ p {
 	cursor: pointer;
 }
 
-#choiceImg {
+.choiceImg {
 	width: 150px;
 	height: auto;
 	display: block;

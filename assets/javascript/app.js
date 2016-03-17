@@ -4,6 +4,8 @@ $(document).ready(function() {
 	var playerNum = 0;
 	var numChoices = 0;
 	var opponentChoice = "";
+	var draws = 0;
+	var opponentName = "";
 	var player = {
 		name: "",
 		choice: "",
@@ -23,19 +25,19 @@ $(document).ready(function() {
 			numPlayers++;
 			if(numPlayers == 1)
 			{
+				playerNum = 1;
 				gameData.update({
 					one: player,
 					numPlayers: numPlayers
 				});
-				playerNum = 1;
 			} 
 			if(numPlayers == 2)
 			{
+				playerNum = 2;
 				gameData.update({
 					two: player,
 					numPlayers: numPlayers
 				});
-				playerNum = 2;
 			}
 		}
 		var rock = $('<p>');
@@ -57,7 +59,7 @@ $(document).ready(function() {
 	$(document).on('click', '.choice', function () {
 		player.choice = $(this).attr('id');
 		var choiceImg = $('<img>');
-		choiceImg.attr('id', 'choiceImg');
+		choiceImg.attr('class', 'choiceImg');
 		var imgSrc = "assets/images/" + player.choice + ".png";
 		choiceImg.attr('src', imgSrc);
 		$("#playerOne").append(choiceImg);
@@ -74,14 +76,27 @@ $(document).ready(function() {
 			});
 		}
 	});
+	$("#chatSubmit").on('click', function() {
+		var message = $("#chat").val();
+		gameData.update({
+			chat: message
+		})
+	});
+	gameData.child('chat').on('value', updateChat)
+	function updateChat(snapshot)
+	{
+		$("#chatSpace").append(snapshot.val());
+		$("#chatSpace").append('<br>');
+	}
 	gameData.on("value", function (snapshot) {
 		numPlayers = snapshot.val().numPlayers;
 	});
 	gameData.child("one").child("name").on("value", onNameOne)
 	function onNameOne(snapshot)
 	{	
-		if(playerNum == 2)
+		if(playerNum == 2 || playerNum == 0)
 		{
+
 			console.log("Player 1 entered!");
 			var nameTwo = $('<p>');
 			nameTwo.attr('id', 'opponentName');
@@ -92,7 +107,7 @@ $(document).ready(function() {
 	gameData.child("two").child("name").on("value", onNameTwo)
 	function onNameTwo(snapshot)
 	{
-		if(playerNum == 1)
+		if(playerNum == 1 || playerNum == 0)
 		{
 			console.log("Player 2 entered!");
 			var nameTwo = $('<p>');
@@ -123,7 +138,6 @@ $(document).ready(function() {
 			if(playerNum == 1)
 			{
 				opponentChoice = snapshot.val();
-				console.log("Your oppenent chose " + opponentChoice);
 			}
 			numChoices++;
 			gameData.update({
@@ -138,31 +152,66 @@ $(document).ready(function() {
 			if(player.choice == "rock" && opponentChoice == "scissors")
 			{
 				console.log("you win!");
+				player.wins++;
+				$("#wins").html(player.wins);
 			}
 			else if(player.choice == "rock" && opponentChoice == "paper")
 			{
 				console.log("you lose!");
+				player.losses++;
+				$("#losses").html(player.losses);
 			}
 			else if(player.choice == "paper" && opponentChoice == "rock")
 			{
 				console.log("you win!");
+				player.wins++;
+				$("#wins").html(player.wins);
 			}
 			else if(player.choice == "paper" && opponentChoice == "scissors")
 			{
 				console.log("you lose!");
+				player.losses++;
+				$("#losses").html(player.losses);
 			}
 			else if(player.choice == "scissors" && opponentChoice == "paper")
 			{
 				console.log("you win!");
+				player.wins++;
+				$("#wins").html(player.wins);
 			}
 			else if(player.choice == "scissors" && opponentChoice == "rock")
 			{
 				console.log("you lose!");
+				player.losses++;
+				$("#losses").html(player.losses);
 			}
 			else
 			{
 				console.log("Its a draw!");
+				draws++;
+				$("#draws").html(draws);
 			}
+			var opponentImg = $('<img>');
+			var opponentIcon = 'assets/images/' + opponentChoice + '.png';
+			opponentImg.attr('src', opponentIcon);
+			opponentImg.attr('class', 'choiceImg');
+			$("#playerTwo").append(opponentImg);
+			if(playerNum == 1)
+			{
+				gameData.update({
+					one: player
+				});
+			}
+			else if(playerNum == 2)
+			{
+				gameData.update({
+					two: player
+				});
+			}
+			numChoices = 0;
+			gameData.update({
+				numChoices: numChoices
+			});
 		}
 	}
 });
